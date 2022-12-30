@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20221230130220_Inicial")]
+    [Migration("20221230194817_Inicial")]
     partial class Inicial
     {
         /// <inheritdoc />
@@ -39,9 +39,6 @@ namespace Data.Migrations
                         .HasMaxLength(16)
                         .HasColumnType("nvarchar(16)");
 
-                    b.Property<int?>("FK_PlanoConta_Filhos")
-                        .HasColumnType("int");
-
                     b.Property<int?>("IdPai")
                         .HasColumnType("int");
 
@@ -60,7 +57,7 @@ namespace Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FK_PlanoConta_Filhos");
+                    b.HasIndex("IdPai");
 
                     b.ToTable("PlanoConta", "dbo");
                 });
@@ -69,7 +66,7 @@ namespace Data.Migrations
                 {
                     b.HasOne("Domain.Model.PlanoContaEntity", "ContaPai")
                         .WithMany("ContasFilhas")
-                        .HasForeignKey("FK_PlanoConta_Filhos")
+                        .HasForeignKey("IdPai")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("ContaPai");

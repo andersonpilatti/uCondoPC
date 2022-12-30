@@ -78,26 +78,33 @@ public class PlanoContaService
         await _repository.AddAsync(entity);
     }
 
-    public async Task DeleteAsync(int id)
+
+    public async Task DeleteAsync(string contaCodigo)
     {
-        if (await _repository.AnyAsync(a => a.Id == id))
+        var existe = await _repository.AnyAsync(a => a.Codigo == contaCodigo);
+
+        if (!existe)
         {
             throw new PlanoContaExeception(1007, "Conta não localizada");
         }
 
+        var id = await _repository.GetIdByContaAsync(contaCodigo);
         await _repository.DeleteAsync(id);
     }
+
 
     public async Task<IEnumerable<PlanoContaResponseDTO>> ListEligibleParentAccountsAsync()
     {
         return await _repository.ListEligibleParentAccountsAsync();
     }
 
+
     public async Task<IEnumerable<PlanoContaEntity>> ListAsync(Expression<Func<PlanoContaEntity, bool>> predicate)
     {
         var result = await _repository.ListAsync(predicate);
         return result;
     }
+
 
     public async Task<PlanoContaEntity> Mapper(PlanoContaAddRequestDTO param)
     {

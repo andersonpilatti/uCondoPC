@@ -28,6 +28,21 @@ public class AddAsync
     }
 
     [Test]
+    public async Task Adicionar()
+    {
+        entity = new PlanoContaAddRequestDTO
+        {
+            CodigoConta = "7",
+            CodigoContaPai = null,
+            InAceitaLancamento = true,
+            Nome = "Adicionar",
+            Tipo = "D"
+        };
+
+        await _service.AddAsync(entity);
+    }
+
+    [Test]
     public void ContaPaiInexistente()
     {
         entity = new PlanoContaAddRequestDTO

@@ -1,6 +1,7 @@
 ﻿using Core.DTOs.Base;
 using Core.DTOs.Request;
 using Core.DTOs.Response;
+using Core.Exceptions;
 using Data.Interfaces.Base;
 using Data.Interfaces.Repositories;
 using Domain.Model;
@@ -32,7 +33,20 @@ namespace Data.Repository
 
         public async Task DeleteAsync(int id)
         {
-            await _baseRepository.DeleteAsync(id);
+            try
+            {
+                await _baseRepository.DeleteAsync(id);
+            }
+            catch (Exception ex)
+            {
+                if (ex.InnerException != null &&
+                    ex.InnerException.Message.Contains("DELETE"))
+                {
+                    throw new PlanoContaExeception(999, "Esta conta esta em uso e não pode ser removida!");                    
+                }
+
+                throw;
+            }            
         }
 
         public async Task<PlanoContaEntity?> GetByIdAsync(int id)

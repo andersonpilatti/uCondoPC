@@ -8,8 +8,8 @@ internal class ConnectionMock
 {
     public readonly AppDbContext DB;
 
-	public ConnectionMock()
-	{
+    public ConnectionMock()
+    {
         var options = new DbContextOptionsBuilder<AppDbContext>()
             .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
             .Options;
@@ -20,6 +20,7 @@ internal class ConnectionMock
         {
             InitializePlanoContaAddAsync();
             InitializeSugestNewAccountCodeAsync();
+            InitializeDeleteAsync();
         }
     }
 
@@ -131,5 +132,24 @@ internal class ConnectionMock
         });
 
         DB.SaveChanges();
+    }
+
+    private void InitializeDeleteAsync()
+    {
+        if (!DB.PlanoConta.Any(a => a.Id == 888))
+        {
+            DB.Add<PlanoContaEntity>(new PlanoContaEntity
+            {
+                Id = 888,
+                Codigo = "8",
+                IdPai = null,
+                InAceitaLancamento = false,
+                Nome = "Para remover",
+                Tipo = "R"
+            });
+
+            DB.SaveChanges();
+        }
+        
     }
 }

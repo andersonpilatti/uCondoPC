@@ -4,6 +4,7 @@ using Core.DTOs.Request;
 using Core.DTOs.Response;
 using Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Services.Interfaces;
 using System.Net;
 
@@ -11,7 +12,7 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PlanoContaController 
+    public class PlanoContaController
         : CustomControllerBase
     {
         private readonly IPlanoContaService _planoContaService;
@@ -37,7 +38,7 @@ namespace API.Controllers
                 {
                     Codigo = ex.ErrorCode,
                     Mensagem = ex.Message
-                }) ;
+                });
             }
             catch (Exception)
             {
@@ -48,6 +49,34 @@ namespace API.Controllers
             }
 
             return Ok();
+        }
+
+        [HttpDelete]
+        [Route("/api/v1/[controller]/Exclusao")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(NotificacaoResponseDTO), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Exclusao(string ContaCodigo)
+        {
+            try
+            {
+                await _planoContaService.DeleteAsync(ContaCodigo);
+                return Ok();
+            }
+            catch (PlanoContaExeception ex)
+            {
+                return BadRequest(new NotificacaoResponseDTO
+                {
+                    Codigo = ex.ErrorCode,
+                    Mensagem = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {                
+                return BadRequest(new NotificacaoResponseDTO
+                {
+                    Mensagem = _msgErroGenerico
+                });
+            }
         }
 
         [HttpGet]
@@ -67,7 +96,7 @@ namespace API.Controllers
                 {
                     Mensagem = _msgErroGenerico
                 });
-            }            
+            }
         }
 
         [HttpPost]

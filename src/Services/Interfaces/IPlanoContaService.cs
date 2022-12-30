@@ -9,7 +9,7 @@ namespace Services.Interfaces;
 public interface IPlanoContaService
 {
     Task AddAsync(PlanoContaAddRequestDTO ent);
-    Task DeleteAsync(int id);
+    Task DeleteAsync(string contaCodigo);
 
     Task<IEnumerable<PlanoContaEntity>> ListAsync(Expression<Func<PlanoContaEntity, bool>> predicate);
 

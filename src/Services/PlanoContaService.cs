@@ -1,6 +1,10 @@
-﻿using Core.Exceptions;
+﻿using Core.DTOs.Base;
+using Core.DTOs.Request;
+using Core.DTOs.Response;
+using Core.Exceptions;
 using Data.Interfaces.Repositories;
 using Domain.Model;
+using Microsoft.IdentityModel.Tokens;
 using Services.Interfaces;
 using System.Linq.Expressions;
 
@@ -16,8 +20,15 @@ public class PlanoContaService
         _repository = repository;
     }
 
-    public async Task AddAsync(PlanoContaEntity entity)
+    public async Task AddAsync(PlanoContaAddRequestDTO param)
     {
+        var entity = await Mapper(param);
+
+        if (entity.Tipo != "D" && entity.Tipo != "R")
+        {
+            throw new PlanoContaExeception(1006, "Tipo de conta inválido");
+        }
+
         if (entity.IdPai != null)
         {
             var existe = await _repository.AnyAsync(a => a.Id == entity.IdPai);
@@ -44,7 +55,7 @@ public class PlanoContaService
 
         if (await _repository.AnyAsync(a => a.Codigo == entity.Codigo))
         {
-            throw new PlanoContaExeception(1004, "Código de conta já utilizado");
+            throw new PlanoContaExeception(1004, "Código de conta já cadastrado");
         }
 
         var codigo = entity.Codigo.Split('.');
@@ -55,30 +66,71 @@ public class PlanoContaService
             
             if (! int.TryParse(nivel, out valor))
             {
-                throw new PlanoContaExeception(1004, "Os níveis dos códigos informados devem ser numéricos");
+                throw new PlanoContaExeception(1009, "Os níveis dos códigos informados devem ser numéricos");
             }
 
             if (valor > 999)
             {
-                throw new PlanoContaExeception(1005, "O maior valor para um nível permitido é 999");
+                throw new PlanoContaExeception(1008, "O maior valor para um nível permitido é 999");
             }
         }
 
         await _repository.AddAsync(entity);
     }
 
-    public async Task DeleteAsync(int id)
+
+    public async Task DeleteAsync(string contaCodigo)
     {
-        throw new NotImplementedException();
+        var existe = await _repository.AnyAsync(a => a.Codigo == contaCodigo);
+
+        if (!existe)
+        {
+            throw new PlanoContaExeception(1007, "Conta não localizada");
+        }
+
+        var id = await _repository.GetIdByContaAsync(contaCodigo);
+        await _repository.DeleteAsync(id);
     }
+
+
+    public async Task<IEnumerable<PlanoContaResponseDTO>> ListEligibleParentAccountsAsync()
+    {
+        return await _repository.ListEligibleParentAccountsAsync();
+    }
+
 
     public async Task<IEnumerable<PlanoContaEntity>> ListAsync(Expression<Func<PlanoContaEntity, bool>> predicate)
     {
-        throw new NotImplementedException();
+        var result = await _repository.ListAsync(predicate);
+        return result;
     }
 
-    public async Task Update(PlanoContaEntity entity)
+
+    public async Task<PlanoContaEntity> Mapper(PlanoContaAddRequestDTO param)
     {
-        throw new NotImplementedException();
+        var result = new PlanoContaEntity
+        {
+            Codigo = param.CodigoConta,
+            Nome = param.Nome,
+            Tipo = param.Tipo,
+            InAceitaLancamento = param.InAceitaLancamento
+        };
+
+        if (!param.CodigoContaPai.IsNullOrEmpty())
+        {
+            result.IdPai = await _repository.GetIdByContaAsync(param.CodigoContaPai);
+        }
+
+        return result;
+    }
+
+    public async Task<string> SugestNewAccountCodeAsync(string? CodigoContaPai)
+    {
+        return await _repository.SugestNewAccountCodeAsync(CodigoContaPai);
+    }
+
+    public async Task<BaseListParametersResponseDTO<PlanoContaResponseDTO>> ListGridAsync(DataTableRequestDTO param)
+    {
+        return await _repository.ListGridAsync(param);
     }
 }

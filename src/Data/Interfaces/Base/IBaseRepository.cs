@@ -1,13 +1,16 @@
 ﻿using Core.Base;
+using Data.Context;
 using System.Linq.Expressions;
 
-namespace Core.Interfaces.Base;
+namespace Data.Interfaces.Base;
 
 public interface IBaseRepository<TEntity> 
     where TEntity : BaseEntity
 {
+    AppDbContext DB { get; }
+
     Task<IEnumerable<TEntity>> ListAsync(Expression<Func<TEntity, bool>> predicate);
-    Task<TEntity?> GetById(int id);
+    Task<TEntity?> GetByIdAsync(int id);
 
     Task AddAssync(TEntity entity);
     Task UpdateAsync(TEntity entity);

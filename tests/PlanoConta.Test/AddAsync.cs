@@ -32,6 +32,7 @@ namespace PlanoConta.Test
         {
             entity = new PlanoContaEntity
             {
+                Id = 5,
                 Codigo = "1.4",
                 IdPai = 0,
                 InAceitaLancamento = true,
@@ -39,7 +40,57 @@ namespace PlanoConta.Test
                 Tipo = "R"
             };
 
-            Assert.ThrowsAsync<PlanoContaExeception>(() => _service.AddAsync(entity));
+            var exception = Assert.ThrowsAsync<PlanoContaExeception>(() => _service.AddAsync(entity));
+            Assert.That(exception.ErrorCode, Is.EqualTo(1000));
+        }
+
+        [Test]
+        public void ContaExistente()
+        {
+            entity = new PlanoContaEntity
+            {
+                Id = 5,
+                Codigo = "1",
+                InAceitaLancamento = true,
+                Nome = "Juros",
+                Tipo = "R"
+            };
+
+            var exception = Assert.ThrowsAsync<PlanoContaExeception>(() => _service.AddAsync(entity));
+            Assert.That(exception.ErrorCode, Is.EqualTo(1004));
+        }
+
+        [Test]
+        public void TiposDiferentesFamilia()
+        {
+            entity = new PlanoContaEntity
+            {
+                Id = 5,
+                IdPai = 1,
+                Codigo = "1.5",
+                InAceitaLancamento = true,
+                Nome = "Juros",
+                Tipo = "D"
+            };
+
+            var exception = Assert.ThrowsAsync<PlanoContaExeception>(() => _service.AddAsync(entity));
+            Assert.That(exception.ErrorCode, Is.EqualTo(1001));
+        }
+
+        [Test]
+        public void TiposContaInvalido()
+        {
+            entity = new PlanoContaEntity
+            {
+                Id = 5,
+                Codigo = "1.5",
+                InAceitaLancamento = true,
+                Nome = "Juros",
+                Tipo = "Z"
+            };
+
+            var exception = Assert.ThrowsAsync<PlanoContaExeception>(() => _service.AddAsync(entity));
+            Assert.That(exception.ErrorCode, Is.EqualTo(1006));
         }
     }
 }

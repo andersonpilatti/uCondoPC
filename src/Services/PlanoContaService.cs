@@ -18,6 +18,11 @@ public class PlanoContaService
 
     public async Task AddAsync(PlanoContaEntity entity)
     {
+        if (entity.Tipo != "D" && entity.Tipo != "R")
+        {
+            throw new PlanoContaExeception(1006, "Tipo de conta inválido");
+        }
+
         if (entity.IdPai != null)
         {
             var existe = await _repository.AnyAsync(a => a.Id == entity.IdPai);

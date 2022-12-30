@@ -58,5 +58,7 @@ internal class ConnectionMock
             Nome = "Multas",
             Tipo = "R"
         });
+
+        DB.SaveChanges();
     }
 }

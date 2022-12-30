@@ -17,7 +17,9 @@ internal class PlanoContaEntityConfiguration
         builder
             .HasOne(o => o.ContaPai)
             .WithMany(o => o.ContasFilhas)
-            .OnDelete(DeleteBehavior.NoAction)
-            .HasForeignKey("FK_PlanoConta_Filhos");
+            .HasForeignKey(d => d.IdPai)
+            .OnDelete(DeleteBehavior.NoAction);
+
+
     }
 }

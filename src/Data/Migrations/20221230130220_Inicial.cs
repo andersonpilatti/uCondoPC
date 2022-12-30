@@ -23,12 +23,26 @@ namespace Data.Migrations
                     Codigo = table.Column<string>(type: "nvarchar(16)", maxLength: 16, nullable: false),
                     Nome = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
                     Tipo = table.Column<string>(type: "nvarchar(1)", maxLength: 1, nullable: false),
-                    InAceitaLancamento = table.Column<bool>(type: "bit", nullable: false)
+                    InAceitaLancamento = table.Column<bool>(type: "bit", nullable: false),
+                    IdPai = table.Column<int>(type: "int", nullable: true),
+                    FKPlanoContaFilhos = table.Column<int>(name: "FK_PlanoConta_Filhos", type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PlanoConta", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PlanoConta_PlanoConta_FK_PlanoConta_Filhos",
+                        column: x => x.FKPlanoContaFilhos,
+                        principalSchema: "dbo",
+                        principalTable: "PlanoConta",
+                        principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PlanoConta_FK_PlanoConta_Filhos",
+                schema: "dbo",
+                table: "PlanoConta",
+                column: "FK_PlanoConta_Filhos");
         }
 
         /// <inheritdoc />

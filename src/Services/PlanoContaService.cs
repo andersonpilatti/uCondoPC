@@ -1,6 +1,9 @@
-﻿using Core.Exceptions;
+﻿using Core.DTOs.Request;
+using Core.DTOs.Response;
+using Core.Exceptions;
 using Data.Interfaces.Repositories;
 using Domain.Model;
+using Microsoft.IdentityModel.Tokens;
 using Services.Interfaces;
 using System.Linq.Expressions;
 
@@ -16,8 +19,10 @@ public class PlanoContaService
         _repository = repository;
     }
 
-    public async Task AddAsync(PlanoContaEntity entity)
+    public async Task AddAsync(PlanoContaAddRequestDTO param)
     {
+        var entity = await Mapper(param);
+
         if (entity.Tipo != "D" && entity.Tipo != "R")
         {
             throw new PlanoContaExeception(1006, "Tipo de conta inválido");
@@ -49,7 +54,7 @@ public class PlanoContaService
 
         if (await _repository.AnyAsync(a => a.Codigo == entity.Codigo))
         {
-            throw new PlanoContaExeception(1004, "Código de conta já utilizado");
+            throw new PlanoContaExeception(1004, "Código de conta já cadastrado");
         }
 
         var codigo = entity.Codigo.Split('.');
@@ -74,16 +79,45 @@ public class PlanoContaService
 
     public async Task DeleteAsync(int id)
     {
-        throw new NotImplementedException();
+        if (await _repository.AnyAsync(a => a.Id == id))
+        {
+            throw new PlanoContaExeception(1007, "Conta não localizada");
+        }
+
+        await _repository.DeleteAsync(id);
+    }
+
+    public async Task<IEnumerable<PlanoContaPaiElegivelResponseDTO>> ListEligibleParentAccountsAsync()
+    {
+        return await _repository.ListEligibleParentAccountsAsync();
     }
 
     public async Task<IEnumerable<PlanoContaEntity>> ListAsync(Expression<Func<PlanoContaEntity, bool>> predicate)
     {
-        throw new NotImplementedException();
+        var result = await _repository.ListAsync(predicate);
+        return result;
     }
 
-    public async Task Update(PlanoContaEntity entity)
+    public async Task<PlanoContaEntity> Mapper(PlanoContaAddRequestDTO param)
     {
-        throw new NotImplementedException();
+        var result = new PlanoContaEntity
+        {
+            Codigo = param.CodigoConta,
+            Nome = param.Nome,
+            Tipo = param.Tipo,
+            InAceitaLancamento = param.InAceitaLancamento
+        };
+
+        if (!param.CodigoContaPai.IsNullOrEmpty())
+        {
+            result.IdPai = await _repository.GetIdByContaAsync(param.CodigoContaPai);
+        }
+
+        return result;
+    }
+
+    public async Task<string> SugestNewAccountCodeAsync(string? CodigoContaPai)
+    {
+        return await _repository.SugestNewAccountCodeAsync(CodigoContaPai);
     }
 }

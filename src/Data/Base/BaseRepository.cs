@@ -1,6 +1,6 @@
 ﻿using Core.Base;
-using Core.Interfaces.Base;
 using Data.Context;
+using Data.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -9,8 +9,10 @@ namespace Data.Base;
 public class BaseRepository<TEntity>
     : IBaseRepository<TEntity> where TEntity : BaseEntity
 {
-    protected readonly AppDbContext _db;
+    public readonly AppDbContext _db;
     protected readonly DbSet<TEntity> _dbSet;
+
+    public AppDbContext DB => _db;
 
     public BaseRepository(AppDbContext db)
     {
@@ -50,7 +52,7 @@ public class BaseRepository<TEntity>
         return await query.ToListAsync();
     }
 
-    public async Task<TEntity?> GetById(int id)
+    public async Task<TEntity?> GetByIdAsync(int id)
     {
         return await _dbSet.FindAsync(id);
     }

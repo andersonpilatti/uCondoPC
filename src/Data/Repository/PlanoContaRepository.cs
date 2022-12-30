@@ -1,11 +1,12 @@
-﻿using Core.DTOs.Response;
+﻿using Core.DTOs.Base;
+using Core.DTOs.Request;
+using Core.DTOs.Response;
 using Data.Interfaces.Base;
 using Data.Interfaces.Repositories;
 using Domain.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq.Expressions;
-using System.Reflection.Metadata;
 
 namespace Data.Repository
 {
@@ -49,13 +50,13 @@ namespace Data.Repository
                             .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<PlanoContaPaiElegivelResponseDTO>> ListEligibleParentAccountsAsync()
+        public async Task<IEnumerable<PlanoContaResponseDTO>> ListEligibleParentAccountsAsync()
         {
             return
                 await _baseRepository.DB
                         .PlanoConta
                             .Where(w => w.InAceitaLancamento == false)
-                            .Select(s => new PlanoContaPaiElegivelResponseDTO
+                            .Select(s => new PlanoContaResponseDTO
                             {
                                 Codigo = s.Codigo,
                                 Nome = s.Nome,
@@ -68,6 +69,45 @@ namespace Data.Repository
         public async Task<IEnumerable<PlanoContaEntity>> ListAsync(Expression<Func<PlanoContaEntity, bool>> predicate)
         {
             return await _baseRepository.ListAsync(predicate);
+        }
+
+        public async Task<BaseListParametersResponseDTO<PlanoContaResponseDTO>> ListGridAsync(DataTableRequestDTO param)
+        {
+            var result = new BaseListParametersResponseDTO<PlanoContaResponseDTO>();
+            string? searchBy = param.search;
+
+            if (param.start == 1)
+            {
+                param.start = 0;
+            }
+
+            var query = 
+                _baseRepository
+                    .DB.PlanoConta
+                        .Where(w => string.IsNullOrEmpty(searchBy) || 
+                                   (w.Nome.Contains(searchBy) ||
+                                    w.Codigo.Contains(searchBy)))
+                        .Select(s => new PlanoContaResponseDTO
+                        {
+                            Codigo = s.Codigo,
+                            Nome = s.Nome,
+                            Tipo = s.Tipo
+                        })
+                        .OrderBy(o => o.Codigo);
+
+            result.data = 
+                await query
+                    .Skip(param.start)
+                    .Take(param.length)
+                    .ToListAsync();
+
+            result.start = param.start;
+            result.length = param.length;
+            result.search = param.search;
+            result.recordsTotal = _baseRepository.DB.PlanoConta.Count();
+            result.recordsFiltered = result.data.Count();
+
+            return result;
         }
 
         public async Task<string> SugestNewAccountCodeAsync(string? CodigoContaPai)
@@ -132,5 +172,7 @@ namespace Data.Repository
 
             return result;
         }
+
+
     }
 }

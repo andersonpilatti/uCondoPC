@@ -1,6 +1,6 @@
 ﻿namespace Core.DTOs.Response;
 
-public class PlanoContaPaiElegivelResponseDTO
+public class PlanoContaResponseDTO
 {
     public string Codigo { get; set; } = null!;
     public string Nome { get; set; } = null!;

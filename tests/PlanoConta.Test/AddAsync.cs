@@ -101,6 +101,21 @@ public class AddAsync
         };
 
         var exception = Assert.ThrowsAsync<PlanoContaExeception>(() => _service.AddAsync(entity));
-        Assert.That(exception.ErrorCode, Is.EqualTo(1004));
+        Assert.That(exception.ErrorCode, Is.EqualTo(1009));
+    }
+
+    [Test]
+    public void CodigoDeContaMaior999()
+    {
+        entity = new PlanoContaAddRequestDTO
+        {
+            CodigoConta = "1.1000",
+            InAceitaLancamento = true,
+            Nome = "Juros",
+            Tipo = "R"
+        };
+
+        var exception = Assert.ThrowsAsync<PlanoContaExeception>(() => _service.AddAsync(entity));
+        Assert.That(exception.ErrorCode, Is.EqualTo(1008));
     }
 }

@@ -1,4 +1,5 @@
 ﻿using API.Base;
+using Core.DTOs.Base;
 using Core.DTOs.Request;
 using Core.DTOs.Response;
 using Core.Exceptions;
@@ -23,7 +24,7 @@ namespace API.Controllers
         [HttpPost]
         [Route("/api/v1/[controller]/Inclusao")]
         [ProducesResponseType(typeof(NotificacaoResponseDTO), (int)HttpStatusCode.BadRequest)]
-        [ProducesResponseType(typeof(PlanoContaPaiElegivelResponseDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(PlanoContaResponseDTO), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Inclusao([FromBody] PlanoContaAddRequestDTO param)
         {
             try
@@ -51,7 +52,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("/api/v1/[controller]/ListarContasPaiElegiveis")]
-        [ProducesResponseType(typeof(PlanoContaPaiElegivelResponseDTO), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(IEnumerable<PlanoContaResponseDTO>), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(NotificacaoResponseDTO), (int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> ListarContasPaiElegiveis()
         {
@@ -67,6 +68,25 @@ namespace API.Controllers
                     Mensagem = _msgErroGenerico
                 });
             }            
+        }
+
+        [HttpPost]
+        [Route("/api/v1/[controller]/ListarContas")]
+        [ProducesResponseType(typeof(BaseListParametersResponseDTO<PlanoContaResponseDTO>), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(NotificacaoResponseDTO), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> ListarContas([FromBody] DataTableRequestDTO param)
+        {
+            try
+            {
+                return Ok(await _planoContaService.ListGridAsync(param));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new NotificacaoResponseDTO
+                {
+                    Mensagem = _msgErroGenerico
+                });
+            }
         }
 
         [HttpGet]
@@ -87,5 +107,7 @@ namespace API.Controllers
                 });
             }
         }
+
+
     }
 }

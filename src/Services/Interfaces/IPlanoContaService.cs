@@ -1,4 +1,5 @@
-﻿using Core.DTOs.Request;
+﻿using Core.DTOs.Base;
+using Core.DTOs.Request;
 using Core.DTOs.Response;
 using Domain.Model;
 using System.Linq.Expressions;
@@ -12,6 +13,8 @@ public interface IPlanoContaService
 
     Task<IEnumerable<PlanoContaEntity>> ListAsync(Expression<Func<PlanoContaEntity, bool>> predicate);
 
-    Task<IEnumerable<PlanoContaPaiElegivelResponseDTO>> ListEligibleParentAccountsAsync();
+    Task<IEnumerable<PlanoContaResponseDTO>> ListEligibleParentAccountsAsync();
+    Task<BaseListParametersResponseDTO<PlanoContaResponseDTO>> ListGridAsync(DataTableRequestDTO param);
+
     Task<string> SugestNewAccountCodeAsync(string? CodigoContaPai);
 }

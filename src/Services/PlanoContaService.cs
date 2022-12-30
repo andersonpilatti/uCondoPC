@@ -1,4 +1,5 @@
-﻿using Core.DTOs.Request;
+﻿using Core.DTOs.Base;
+using Core.DTOs.Request;
 using Core.DTOs.Response;
 using Core.Exceptions;
 using Data.Interfaces.Repositories;
@@ -65,12 +66,12 @@ public class PlanoContaService
             
             if (! int.TryParse(nivel, out valor))
             {
-                throw new PlanoContaExeception(1004, "Os níveis dos códigos informados devem ser numéricos");
+                throw new PlanoContaExeception(1009, "Os níveis dos códigos informados devem ser numéricos");
             }
 
             if (valor > 999)
             {
-                throw new PlanoContaExeception(1005, "O maior valor para um nível permitido é 999");
+                throw new PlanoContaExeception(1008, "O maior valor para um nível permitido é 999");
             }
         }
 
@@ -87,7 +88,7 @@ public class PlanoContaService
         await _repository.DeleteAsync(id);
     }
 
-    public async Task<IEnumerable<PlanoContaPaiElegivelResponseDTO>> ListEligibleParentAccountsAsync()
+    public async Task<IEnumerable<PlanoContaResponseDTO>> ListEligibleParentAccountsAsync()
     {
         return await _repository.ListEligibleParentAccountsAsync();
     }
@@ -119,5 +120,10 @@ public class PlanoContaService
     public async Task<string> SugestNewAccountCodeAsync(string? CodigoContaPai)
     {
         return await _repository.SugestNewAccountCodeAsync(CodigoContaPai);
+    }
+
+    public async Task<BaseListParametersResponseDTO<PlanoContaResponseDTO>> ListGridAsync(DataTableRequestDTO param)
+    {
+        return await _repository.ListGridAsync(param);
     }
 }

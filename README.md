@@ -15,8 +15,8 @@ No console acesse a pasta da solução e execute o comando
 	dotnet ef database update -p src\Data -s src\API
 
 
-## executar testes
-Os testes são executados numa versao do contexto inMemory
+## Executar testes unitários
+Os testes são executados numa versao do contexto inMemory 
 No console acesse a pasta da solução e execute o comando
 	dotnet test
 
@@ -60,5 +60,5 @@ Em todos os metodos são passados os números das contas ao invés do Id
 
 ## Feedback
 Anderson Caetano Pilatti
-anderson@tyle.com.br
+<a href="mailto:anderson@tyle.com.br">anderson@tyle.com.br</a>
 (41) 9 9925-7281

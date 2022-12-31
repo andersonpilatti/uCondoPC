@@ -1,6 +1,6 @@
 ## Hands On - uCondo
 Como se trata de um teste básico não foi implementada autenticação, 
-sendo todos os métodos são públicos
+sendo assim todos os métodos são públicos
 
 
 ## Aplicar Migration
